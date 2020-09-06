@@ -23,6 +23,7 @@ int main(int argc, char** argv)
         {0.1, 0.2},
         {-0.3, -0.2},
         {-0.5, -0.7},
+        {-0.7, -0.8},
         {0.8, -0.8},
         {0.8, -0.9},
     };
@@ -31,12 +32,12 @@ int main(int argc, char** argv)
         pointsVector[i] = {points[i].x, points[i].y};
 
 
-    vector<double> circleHeur = minCircleHeuristic(points);
-    vector<double> circleReal = minCircle(points);
+    Circle circleHeur = minCircleHeuristic(points);
+    Circle circleReal = minCircle(points);
 
     vector<vector<double>> circles = {
-        {circleHeur[0], circleHeur[1], circleHeur[2], 0.2, 0.8, 0.2},
-        {circleReal[0], circleReal[1], circleReal[2], 0.8, 0.2, 0.3},
+        {circleHeur.center.x, circleHeur.center.y, circleHeur.radius, 0.2, 0.8, 0.2},
+        {circleReal.center.x, circleReal.center.y, circleReal.radius, 0.8, 0.2, 0.3},
     };
 
 
