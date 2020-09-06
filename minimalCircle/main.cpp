@@ -10,7 +10,7 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-    vector<vector<double>> points = {
+    vector<Point> points = {
         {0.1, 0.2},
         {-0.3, 0.2},
         {0.5, 0.7},
@@ -26,12 +26,16 @@ int main(int argc, char** argv)
         {0.8, -0.8},
         {0.8, -0.9},
     };
+    vector<vector<double>> pointsVector(points.size());
+    for(int i=0; i<points.size(); ++i)
+        pointsVector[i] = {points[i].x, points[i].y};
+
 
     vector<double> circleHeur = minCircleHeuristic(points);
     vector<double> circleReal = minCircle(points);
 
     vector<vector<double>> circles = {
-        {circleHeur[0], circleHeur[1], circleHeur[2], 0.3, 0.0, 0.8},
+        {circleHeur[0], circleHeur[1], circleHeur[2], 0.2, 0.8, 0.2},
         {circleReal[0], circleReal[1], circleReal[2], 0.8, 0.2, 0.3},
     };
 
@@ -44,7 +48,7 @@ int main(int argc, char** argv)
     window.set_title("Minimal Circle Algorithms");
 
     CCanvas area;
-    area.points = &points;
+    area.points = &pointsVector;
     area.circles = &circles;
     window.add(area);
     area.show();
