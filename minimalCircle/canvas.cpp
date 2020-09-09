@@ -2,7 +2,7 @@
 #include "canvas.h"
 #define POINT_SIZE 4
 #define CENTER_MARK_SIZE 10
-#define POINTS_SCALE 100
+#define POINTS_SCALE 0.5
 
 bool CCanvas::on_draw(Cairo::RefPtr<Cairo::Context> const & cr)
 {

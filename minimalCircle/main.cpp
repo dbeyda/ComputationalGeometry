@@ -5,28 +5,16 @@
 
 #include "canvas.h"
 #include "circleAlgorithms.h"
+#include "pointGenerator.h"
 
 using namespace std;
 
 int main(int argc, char** argv)
 {
-    vector<Point> points = {
-        {0.1, 0.2},
-        {-0.3, 0.2},
-        {0.5, 0.7},
-        {-0.2, -0.9},
-        {0.77, 0.4},
-        {0.4, -0.1},
-        {-0.1, 0.8},
-        {-0.4, 0.8},
-        {0.2, 0.7},
-        {0.1, 0.2},
-        {-0.3, -0.2},
-        {-0.5, -0.7},
-        {-0.7, -0.8},
-        {0.8, -0.8},
-        {0.8, -0.9},
-    };
+    vector<Point> points;
+    // pointsFromFile(points, "points.txt");
+    generateRandomPoints(points, 1000, -400, 400);
+
     vector<vector<double>> pointsVector(points.size());
     for(int i=0; i<points.size(); ++i)
         pointsVector[i] = {points[i].x, points[i].y};
