@@ -22,8 +22,8 @@ void pointsFromFile(vector<Point>& points, string path)
 
 void generateRandomPoints(vector<Point>& points, int n, int lowerLimit, int upperLimit)
 {
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    // std::random_device rd;
+    std::mt19937 gen(0);
     std::normal_distribution<double> radius(0, 80000);
     std::uniform_real_distribution<double> theta(0, 2 * M_PI);
 
