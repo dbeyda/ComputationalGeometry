@@ -15,7 +15,7 @@ using namespace std;
  * A function that returns the orientation determinant
  * of a point p with respect to a segment ab
  */
-inline int orientation(Point& p, Point& a, Point& b)
+inline double orientation(Point& p, Point& a, Point& b)
 {
     return (b.x*p.y + a.x*b.y + a.y*p.x
             - a.y*b.x - a.x*p.y - b.y*p.x);
