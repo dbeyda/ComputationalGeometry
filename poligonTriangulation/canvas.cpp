@@ -24,7 +24,19 @@ bool CCanvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
             drawPoint(p[0], p[1], cr);
         drawPoly(cr);
     }
-
+    if (diagonals)
+    {
+        cr->save();
+        cr->set_source_rgb(1.0, 0.0, 0.0);
+        for(int i=0; i < diagonals->size()-1; i += 2)
+        {
+            drawLine(diagonals->at(i)[0],diagonals->at(i)[1],
+                     diagonals->at(i+1)[0], diagonals->at(i+1)[1],
+                     cr);
+        }
+        cr->stroke();
+        cr->restore();
+    }
     return true;
 }
 
@@ -54,23 +66,20 @@ void CCanvas::drawPoint(double x, double y, const Cairo::RefPtr<Cairo::Context>&
 
 void CCanvas::drawLine(double x1, double y1, double x2, double y2, const Cairo::RefPtr<Cairo::Context>& cr)
 {
-    cr->save();
-    cr->move_to(x1 * POINTS_SCALE, height-y1 * POINTS_SCALE);
-    cr->line_to(x2 * POINTS_SCALE, height-y2 * POINTS_SCALE);
-    cr->restore();
-    cr->stroke();
+    cr->move_to(x1 * POINTS_SCALE, height - y1 * POINTS_SCALE);
+    cr->line_to(x2 * POINTS_SCALE, height - y2 * POINTS_SCALE);
 }
 
 void CCanvas::drawPoly(const Cairo::RefPtr<Cairo::Context>& cr)
 {
     if(points->size() < 2) return;
+    cr->save();
     for(int i=0; i<points->size()-1; ++i)
     {
         drawLine(points->at(i)[0], points->at(i)[1],
                  points->at(i+1)[0], points->at(i+1)[1], cr);
 
     }
-    // close the polygon
-    drawLine(points->back()[0], points->back()[1],
-                points->front()[0], points->front()[1], cr);
+    cr->restore();
+    cr->stroke();
 }

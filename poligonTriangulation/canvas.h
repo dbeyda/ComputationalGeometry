@@ -10,7 +10,8 @@ class CCanvas : public Gtk::DrawingArea
 public:
     // points to to drawn {{xCoord, yCoord},}
     vector<vector<double>> *points;
-    CCanvas() : points(nullptr) {};
+    vector<vector<double>> *diagonals;
+    CCanvas() : points(nullptr), diagonals(nullptr) {};
     virtual ~CCanvas() {};
 
 protected:

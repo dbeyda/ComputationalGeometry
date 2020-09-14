@@ -2,29 +2,39 @@
 #include <gtkmm/window.h>
 #include <iostream>
 #include <vector>
+#include <string>
 
 #include "canvas.h"
-#include "triangulationAlgorithm.h"
-#include "polyImporter.h"
+#include "polygonAlgorithms.h"
+#include "fileHandler.h"
+
+const char INPUT_FILE[] = "polygon2.txt";
+const char OUTPUT_FILE[] = "diagonals2.txt";
 
 using namespace std;
 
-int main(int argc, char** argv)
+int main(int argc, char *argv[])
 {
     vector<Point> poly;
+    vector<Point> diagonals;
+    vector<int> diagonalIds;
 
-    // poligonFromFile(poly, "polygon1.txt");
-    poligonFromFile(poly, "polygon2.txt");
+    poligonFromFile(poly, INPUT_FILE);
+    triangulate(poly, diagonals, diagonalIds);
+    diagonalsToFile(diagonalIds, OUTPUT_FILE);
 
-
-    // The code below is just to generate the visualization.
-    // It can be commented while running the tests with random numbers
-
-    // Application code: draw points and minimum circles
+    // The code below is just to generate the visualization. ###################################
 
     vector<vector<double>> pointsVector(poly.size());
     for(int i=0; i<poly.size(); ++i)
         pointsVector[i] = {poly[i].x, poly[i].y};
+
+    // closing polygon for drawing
+    pointsVector.push_back(vector<double>{poly.front().x, poly.front().y});
+
+    vector<vector<double>> diagonalsVector(diagonals.size());
+    for(int i=0; i<diagonals.size(); ++i)
+        diagonalsVector[i] = {diagonals[i].x, diagonals[i].y};
 
     auto app = Gtk::Application::create(argc, argv, "triangulated.polygons");
 
@@ -34,9 +44,10 @@ int main(int argc, char** argv)
 
     CCanvas area;
     area.points = &pointsVector;
+    area.diagonals = &diagonalsVector;
     window.add(area);
     area.show();
 
     return app->run(window);
-    return 0;
+    // return 0;
 }
