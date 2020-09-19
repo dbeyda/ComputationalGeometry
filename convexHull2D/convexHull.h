@@ -84,8 +84,9 @@ inline void findConvexHull(vector<Point>& points, vector<int>& ids)
     double elapsed = double(end - start)/CLOCKS_PER_SEC;
 
     cout << "results: "
-         << "\n\tnumber of points: " << points.size()
-         << "\n\tnumber of hull points: " << ids.size()
+         << "\n\tnumber of points (n): " << points.size()
+         << "\n\tnumber of hull points (h): " << ids.size()
+         << "\n\tn * h: " << points.size() * ids.size()
          << "\n\tTime: " << setprecision(5) << elapsed * 1000 << " ms."
          << "\n";
     cout << "---------------------\n";

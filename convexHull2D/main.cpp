@@ -19,11 +19,11 @@ int main(int argc, char *argv[])
     vector<int> hullIds;
 
     // pointsFromFile(points, INPUT_FILE);
-    generateRandomPoints(points, 1000, 400, 400);
+    generateRandomPoints(points, 10000, 400, 400);
     findConvexHull(points, hullIds);
     hullToFile(hullIds, OUTPUT_FILE);
 
-    // The code below is just to generate the visualization. ###################################
+    // // The code below is just to generate the visualization. ###################################
 
     vector<vector<double>> pointsVector(points.size());
     for(int i=0; i<points.size(); ++i)
@@ -39,11 +39,11 @@ int main(int argc, char *argv[])
     // closing hull for drawing
     hullVector.push_back(hullVector.front());
 
-    auto app = Gtk::Application::create(argc, argv, "triangulated.polygons");
+    auto app = Gtk::Application::create(argc, argv, "convex.hull");
 
     Gtk::Window window;
     window.resize(800,600);
-    window.set_title("Polygon Triangulation");
+    window.set_title("Convex Hull");
 
     CCanvas area;
     area.points = &pointsVector;
