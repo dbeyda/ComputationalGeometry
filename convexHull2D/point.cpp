@@ -14,3 +14,23 @@ double Point::distance(Point& p1, Point& p2)
     double y = abs(p2.y - p1.y);
     return sqrt(x*x + y*y);
 }
+
+Point Point::operator-(Point& other)
+{
+    return Point({x - other.x, y - other.y});
+}
+
+Point Point::operator+(Point& other)
+{
+    return Point({x + other.x, y + other.y});
+}
+
+Point Point::operator*(double a)
+{
+    return Point({x*a, y*a});
+}
+
+Point Point::operator/(double a)
+{
+    return Point({x/a, y/a});
+}

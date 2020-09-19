@@ -28,7 +28,7 @@ void hullToFile(vector<int>& ids, const char* path)
     if (myfile.is_open())
     {
        for(int i=0; i < ids.size(); ++i)
-           myfile << ids[i] << ((i%2) ? "\n" : " ");
+           myfile << ids[i] << "\n";
         myfile.close();
     }
     else

@@ -5,36 +5,36 @@
 #include <string>
 
 #include "canvas.h"
-#include "polygonAlgorithms.h"
+#include "convexHull.h"
 #include "aux.h"
 
-const char INPUT_FILE[] = "fecho1.txt";
-const char OUTPUT_FILE[] = "saida1.txt";
+const char INPUT_FILE[] = "fecho2.txt";
+const char OUTPUT_FILE[] = "saida2.txt";
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-    vector<Point> poly;
-    vector<Point> diagonals;
-    vector<int> diagonalIds;
+    vector<Point> points;
+    vector<Point> hull;
+    vector<int> hullIds;
 
-    poligonFromFile(poly, INPUT_FILE);
-    triangulate(poly, diagonals, diagonalIds);
-    diagonalsToFile(diagonalIds, OUTPUT_FILE);
+    pointsFromFile(points, INPUT_FILE);
+    findConvexHull(points, hull, hullIds);
+    //hullToFile(hullIds, OUTPUT_FILE);
 
     // The code below is just to generate the visualization. ###################################
 
-    vector<vector<double>> pointsVector(poly.size());
-    for(int i=0; i<poly.size(); ++i)
-        pointsVector[i] = {poly[i].x, poly[i].y};
+    vector<vector<double>> pointsVector(points.size());
+    for(int i=0; i<points.size(); ++i)
+        pointsVector[i] = {points[i].x, points[i].y};
 
-    // closing polygon for drawing
-    pointsVector.push_back(vector<double>{poly.front().x, poly.front().y});
+    vector<vector<double>> hullVector(hull.size());
+        for(int i=0; i<hull.size(); ++i)
+            hullVector[i] = {hull[i].x, hull[i].y};
 
-    vector<vector<double>> diagonalsVector(diagonals.size());
-    for(int i=0; i<diagonals.size(); ++i)
-        diagonalsVector[i] = {diagonals[i].x, diagonals[i].y};
+    // closing hull for drawing
+    hullVector.push_back(hullVector.front());
 
     auto app = Gtk::Application::create(argc, argv, "triangulated.polygons");
 
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
     CCanvas area;
     area.points = &pointsVector;
-    area.diagonals = &diagonalsVector;
+    area.hull = &hullVector;
     window.add(area);
     area.show();
 

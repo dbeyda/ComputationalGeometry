@@ -19,23 +19,21 @@ bool CCanvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
     cr->set_line_width(1);
 
     if (points)
-    {
         for(auto& p : *points)
             drawPoint(p[0], p[1], cr);
-        drawPoly(cr);
-    }
-    if (diagonals)
+    if (hull)
     {
-        cr->save();
-        cr->set_source_rgb(1.0, 0.0, 0.0);
-        for(int i=0; i < diagonals->size()-1; i += 2)
-        {
-            drawLine(diagonals->at(i)[0],diagonals->at(i)[1],
-                     diagonals->at(i+1)[0], diagonals->at(i+1)[1],
-                     cr);
-        }
-        cr->stroke();
-        cr->restore();
+        drawPoly(cr, *hull);
+        // cr->save();
+        // cr->set_source_rgb(1.0, 0.0, 0.0);
+        // for(int i=0; i < hull->size()-1; i += 2)
+        // {
+        //     drawLine(hull->at(i)[0],hull->at(i)[1],
+        //              hull->at(i+1)[0], hull->at(i+1)[1],
+        //              cr);
+        // }
+        // cr->stroke();
+        // cr->restore();
     }
     return true;
 }
@@ -70,16 +68,13 @@ void CCanvas::drawLine(double x1, double y1, double x2, double y2, const Cairo::
     cr->line_to(x2 * POINTS_SCALE, height - y2 * POINTS_SCALE);
 }
 
-void CCanvas::drawPoly(const Cairo::RefPtr<Cairo::Context>& cr)
+void CCanvas::drawPoly(const Cairo::RefPtr<Cairo::Context>& cr, vector<vector<double>>& v)
 {
-    if(points->size() < 2) return;
+    if(v.size() < 2) return;
     cr->save();
-    for(int i=0; i<points->size()-1; ++i)
-    {
-        drawLine(points->at(i)[0], points->at(i)[1],
-                 points->at(i+1)[0], points->at(i+1)[1], cr);
-
-    }
+    for(int i=0; i<v.size()-1; ++i)
+        drawLine(v[i][0], v[i][1],
+                 v[i+1][0], v[i+1][1], cr);
     cr->restore();
     cr->stroke();
 }
