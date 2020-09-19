@@ -37,8 +37,8 @@ void hullToFile(vector<int>& ids, const char* path)
 
 void generateRandomPoints(vector<Point>& points, int n, double xc, double yc)
 {
-    // std::random_device rd;
-    std::mt19937 gen(0);
+    std::random_device rd;
+    std::mt19937 gen(rd());
     std::normal_distribution<double> radius(0, 12000);
     std::uniform_real_distribution<double> theta(0, 2 * M_PI);
 

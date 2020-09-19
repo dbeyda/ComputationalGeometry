@@ -23,8 +23,8 @@ inline double getAngle(Point& p1, Point& p2, Point& p3)
 }
 
 /**
- * Finds convex hull of a set of points
- * adds hull points indexes to ids vector
+ * Finds convex hull of a set of points using the Gift Wrapping
+ * algorithm. Adds hull points indexes to ids vector.
  */
 inline void findConvexHull(vector<Point>& points, vector<int>& ids)
 {

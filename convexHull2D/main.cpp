@@ -8,8 +8,8 @@
 #include "convexHull.h"
 #include "aux.h"
 
-const char INPUT_FILE[] = "fecho1.txt";
-const char OUTPUT_FILE[] = "saida1.txt";
+const char INPUT_FILE[] = "fecho2.txt";
+const char OUTPUT_FILE[] = "saida2.txt";
 
 using namespace std;
 
@@ -18,12 +18,12 @@ int main(int argc, char *argv[])
     vector<Point> points;
     vector<int> hullIds;
 
-    // pointsFromFile(points, INPUT_FILE);
-    generateRandomPoints(points, 10000, 400, 400);
+    pointsFromFile(points, INPUT_FILE);
+    // generateRandomPoints(points, 700000, 400, 400);
     findConvexHull(points, hullIds);
     hullToFile(hullIds, OUTPUT_FILE);
 
-    // // The code below is just to generate the visualization. ###################################
+    // The code below is just to generate the visualization. ###################################
 
     vector<vector<double>> pointsVector(points.size());
     for(int i=0; i<points.size(); ++i)
