@@ -28,6 +28,9 @@ inline double getAngle(Point& p1, Point& p2, Point& p3)
  */
 inline void findConvexHull(vector<Point>& points, vector<int>& ids)
 {
+    cout << "---------------------\n";
+    clock_t start = clock();
+
     // finding first hull point -- rightmost point
     int firstIdx = 0;
     for(int i=0; i<points.size(); ++i)
@@ -76,4 +79,14 @@ inline void findConvexHull(vector<Point>& points, vector<int>& ids)
         lastIdx = originIdx;
         originIdx = maxIdx;
     }
+
+    clock_t end = clock();
+    double elapsed = double(end - start)/CLOCKS_PER_SEC;
+
+    cout << "results: "
+         << "\n\tnumber of points: " << points.size()
+         << "\n\tnumber of hull points: " << ids.size()
+         << "\n\tTime: " << setprecision(5) << elapsed * 1000 << " ms."
+         << "\n";
+    cout << "---------------------\n";
 }
