@@ -5,5 +5,5 @@
 
 void pointsFromFile(vector<Point>& points, const char* path);
 void hullToFile(vector<int>& ids, const char* path);
-void generateRandomPoints(vector<Point>& points, int n, int lowerLimit, int upperLimit);
+void generateRandomPoints(vector<Point>& points, int n, double xc, double yc);
 

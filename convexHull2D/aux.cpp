@@ -35,11 +35,11 @@ void hullToFile(vector<int>& ids, const char* path)
         cout << "!! Error !! Could not open output file.\n";
 }
 
-void generateRandomPoints(vector<Point>& points, int n, int lowerLimit, int upperLimit)
+void generateRandomPoints(vector<Point>& points, int n, double xc, double yc)
 {
     // std::random_device rd;
     std::mt19937 gen(0);
-    std::normal_distribution<double> radius(0, 80000);
+    std::normal_distribution<double> radius(0, 12000);
     std::uniform_real_distribution<double> theta(0, 2 * M_PI);
 
     double r, t;
@@ -48,7 +48,7 @@ void generateRandomPoints(vector<Point>& points, int n, int lowerLimit, int uppe
         r = radius(gen);
         r = (r < 0) ? -sqrt(-r) : sqrt(r);
         t = theta(gen);
-        points.push_back({r * cos(t), r * sin(t)});
+        points.push_back({xc + r * cos(t), yc + r * sin(t)});
         // std::cout << n << " - " << points.back().x << " " << points.back().y << '\n';
     }
 }

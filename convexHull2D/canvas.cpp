@@ -22,19 +22,9 @@ bool CCanvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
         for(auto& p : *points)
             drawPoint(p[0], p[1], cr);
     if (hull)
-    {
-        drawPoly(cr, *hull);
-        // cr->save();
-        // cr->set_source_rgb(1.0, 0.0, 0.0);
-        // for(int i=0; i < hull->size()-1; i += 2)
-        // {
-        //     drawLine(hull->at(i)[0],hull->at(i)[1],
-        //              hull->at(i+1)[0], hull->at(i+1)[1],
-        //              cr);
-        // }
-        // cr->stroke();
-        // cr->restore();
-    }
+        drawPoly(cr, *hull, 1.0);
+        for(auto& p : *hull)
+            drawPoint(p[0], p[1], cr, 1.0);
     return true;
 }
 
@@ -50,13 +40,13 @@ void CCanvas::drawCenterMark(double xc, double yc, const Cairo::RefPtr<Cairo::Co
     cr->stroke();
 }
 
-void CCanvas::drawPoint(double x, double y, const Cairo::RefPtr<Cairo::Context>& cr)
+void CCanvas::drawPoint(double x, double y, const Cairo::RefPtr<Cairo::Context>& cr, double r, double g, double b)
 {
     x *= POINTS_SCALE;
     y *= POINTS_SCALE;
     cr->save();
     cr->rectangle(x - POINT_SIZE/2, height-y - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);
-    cr->set_source_rgb(0.0, 0.0, 0.0);
+    cr->set_source_rgb(r, g, b);
     cr->fill_preserve();
     cr->restore();
     cr->stroke();
@@ -68,13 +58,14 @@ void CCanvas::drawLine(double x1, double y1, double x2, double y2, const Cairo::
     cr->line_to(x2 * POINTS_SCALE, height - y2 * POINTS_SCALE);
 }
 
-void CCanvas::drawPoly(const Cairo::RefPtr<Cairo::Context>& cr, vector<vector<double>>& v)
+void CCanvas::drawPoly(const Cairo::RefPtr<Cairo::Context>& cr, vector<vector<double>>& v, double r, double g, double b)
 {
     if(v.size() < 2) return;
     cr->save();
+    cr->set_source_rgb(r, g, b);
     for(int i=0; i<v.size()-1; ++i)
         drawLine(v[i][0], v[i][1],
                  v[i+1][0], v[i+1][1], cr);
-    cr->restore();
     cr->stroke();
+    cr->restore();
 }

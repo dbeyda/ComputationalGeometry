@@ -13,4 +13,7 @@ public:
     Point operator+(Point& other);
     Point operator*(double a);
     Point operator/(double a);
+    Point normalize();
+    double magnitude();
+    double dot(Point& other);
 };

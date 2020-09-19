@@ -34,3 +34,18 @@ Point Point::operator/(double a)
 {
     return Point({x/a, y/a});
 }
+
+Point Point::normalize()
+{
+    return Point({x/magnitude(), y/magnitude()});
+}
+
+double Point::magnitude()
+{
+    return sqrt(x*x + y*y);
+}
+
+double Point::dot(Point& other)
+{
+    return x*other.x + y*other.y;
+}
