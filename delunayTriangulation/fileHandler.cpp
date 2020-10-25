@@ -41,20 +41,17 @@ void delunayToFile(TriangleAdjacencyTable& adj, const char* path)
         cout << "!! Error !! Could not open output file.\n";
 }
 
-void generateRandomPoints(vector<Point>& points, int n, double xc, double yc)
+void generateRandomPoints(vector<Point>& points, int n)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::normal_distribution<double> radius(0, 12000);
-    std::uniform_real_distribution<double> theta(0, 2 * M_PI);
+    std::uniform_int_distribution<int> randint(300, 1000);
 
-    double r, t;
+    double x, y;
     while(n--)
     {
-        r = radius(gen);
-        r = (r < 0) ? -sqrt(-r) : sqrt(r);
-        t = theta(gen);
-        points.push_back({xc + r * cos(t), yc + r * sin(t)});
-        // std::cout << n << " - " << points.back().x << " " << points.back().y << '\n';
+        x = (double) randint(gen);
+        y = (double) randint(gen);
+        points.push_back({x, y});
     }
 }

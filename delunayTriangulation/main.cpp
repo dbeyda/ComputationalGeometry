@@ -25,15 +25,21 @@ int main(int argc, char *argv[])
     vector<Point> points;
     TriangleAdjacencyTable adjTable;
 
+    clock_t start, end;
+
     pointsFromFile(points, INPUT_FILE);
+    // generateRandomPoints(points, 50000);
+    start = clock();
     delunayTriangulate(points, adjTable);
-
-    cout << "File: " << INPUT_FILE << "\n";
-    cout << "Number of points: " << points.size() << "\n";
-    cout << "Number of triangles: " << adjTable.table.size() << "\n";
-    cout << "\t(before removing supertriangle)\n";
-
+    end = clock();
     delunayToFile(adjTable, OUTPUT_FILE);
+
+    cout << "File: " << INPUT_FILE << "\n"
+         << "Number of points: " << points.size() << "\n"
+         << "Number of triangles: " << adjTable.table.size()
+         << " (before removing supertriangle)\n"
+         << "Time: " << 1000 * (end-start) / CLOCKS_PER_SEC << " ms\n";
+
 
     // The code below is just to generate the visualization. ###################################
 
