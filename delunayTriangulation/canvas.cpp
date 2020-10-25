@@ -20,15 +20,21 @@ bool CCanvas::on_draw(const Cairo::RefPtr<Cairo::Context>& cr)
 
     if (points)
     {
-        for(auto& p : *points)
-            drawPoint(p[0], p[1], cr);
+        for(int i=0; i < points->size(); ++i)
+        {
+            double x = points->at(i)[0];
+            double y = points->at(i)[1];
+            char buffer[20];
+            sprintf(buffer, "%d (%.0f, %.0f)", i, x, y);
+            drawPoint(x, y, cr, string(buffer));
+        }
     }
     if (triangles)
     {
         cr->save();
         cr->set_source_rgb(1.0, 0.0, 0.0);
         for(int i=0; i < triangles->size(); ++i)
-            drawPoly(triangles->at(i), cr);
+            drawPoly(triangles->at(i), cr, to_string(i));
 
         cr->stroke();
         cr->restore();
@@ -48,11 +54,16 @@ void CCanvas::drawCenterMark(double xc, double yc, const Cairo::RefPtr<Cairo::Co
     cr->stroke();
 }
 
-void CCanvas::drawPoint(double x, double y, const Cairo::RefPtr<Cairo::Context>& cr)
+void CCanvas::drawPoint(double x, double y, const Cairo::RefPtr<Cairo::Context>& cr, string label)
 {
     x *= POINTS_SCALE;
     y *= POINTS_SCALE;
     cr->save();
+    if (pointsLabel && label.size())
+    {
+        cr->move_to(x - POINT_SIZE/2, height-y - POINT_SIZE/2);
+        cr->show_text(label.c_str());
+    }
     cr->rectangle(x - POINT_SIZE/2, height-y - POINT_SIZE/2, POINT_SIZE, POINT_SIZE);
     cr->set_source_rgb(0.0, 0.0, 0.0);
     cr->fill_preserve();
@@ -66,7 +77,7 @@ void CCanvas::drawLine(double x1, double y1, double x2, double y2, const Cairo::
     cr->line_to(x2 * POINTS_SCALE, height - y2 * POINTS_SCALE);
 }
 
-void CCanvas::drawPoly(vector<double>& poly, const Cairo::RefPtr<Cairo::Context>& cr)
+void CCanvas::drawPoly(vector<double>& poly, const Cairo::RefPtr<Cairo::Context>& cr, string label)
 {
     if(poly.size() < 2) return;
     cr->save();
@@ -80,4 +91,18 @@ void CCanvas::drawPoly(vector<double>& poly, const Cairo::RefPtr<Cairo::Context>
                 poly[0], poly[1], cr);
     cr->restore();
     cr->stroke();
+    if (trianglesLabel && label.size())
+    {
+        double midx = 0.;
+        double midy = 0.;
+        for(int i=0; i<poly.size()-1; i+=2)
+        {
+            midx += poly[i];
+            midy += poly[i+1];
+        }
+        midx /= (poly.size()/2);
+        midy /= (poly.size()/2);
+        cr->move_to(midx * POINTS_SCALE, height - midy * POINTS_SCALE);
+        cr->show_text(label.c_str());
+    }
 }

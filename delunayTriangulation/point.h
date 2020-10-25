@@ -7,6 +7,7 @@ class Point
 {
 public:
     double x, y;
+    int id;
     string toStr();
     static double distance(Point& p1, Point& p2);
     Point operator-(Point& other);

@@ -11,10 +11,12 @@ void pointsFromFile(vector<Point>& points, const char* path)
     ifstream myfile (path);
     if (myfile.is_open())
     {
+        int i = 0;
         while (getline(myfile,line))
         {
             sscanf(line.c_str(), "%lf %lf", &x, &y);
-            points.push_back({x, y});
+            points.push_back({x, y, i});
+            ++i;
         }
         myfile.close();
     }
@@ -22,14 +24,17 @@ void pointsFromFile(vector<Point>& points, const char* path)
         cout << "!! Error !! Could not open input file.\n";
 }
 
-void delunayToFile(vector<int>& ids, const char* path)
+void delunayToFile(TriangleAdjacencyTable& adj, const char* path)
 {
-    cout << "DELUNAY TO FILE NOT IMPLEMENTED\n";
     ofstream myfile(path, ios::out | ios::trunc);
     if (myfile.is_open())
     {
-       for(int i=0; i < ids.size(); ++i)
-           myfile << ids[i] << "\n";
+       for(auto& t : adj.table)
+       {
+           myfile << t.p[0].id << " "
+                  << t.p[1].id << " "
+                  << t.p[2].id << "\n";
+       }
         myfile.close();
     }
     else

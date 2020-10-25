@@ -11,37 +11,22 @@
 
 using namespace std;
 
-typedef struct
-{
-    Point p1, p2, p3;
-} Triangle;
 
-/**
- * A function that returns the orientation determinant
- * of a point p with respect to a segment ab
- */
 double orientation(Point& p, Point& a, Point& b)
 {
     return (b.x*p.y + a.x*b.y + a.y*p.x
             - a.y*b.x - a.x*p.y - b.y*p.x);
 }
 
-/**
- * A function to test if a point p is inside the triangle
- * ABC.
- */
-bool pointInsideTriangle(Point& p, Point& a, Point& b, Point& c)
+bool isConvex(Point& p, Point& a, Point& b)
 {
-    if (orientation(p, a, b) <= -myEpsilon) return false;
-    if (orientation(p, b, c) <= -myEpsilon) return false;
-    if (orientation(p, c, a) <= -myEpsilon) return false;
-    return true;
+    return orientation(p, a, b) > myEpsilon;
+
+    // this is not ideal, but was needed for the star triangulation
+    // to be correct
+    // return orientation(p, a, b) > 200;
 }
 
-/**
- * A function to test if a point p is inside the circle
- * formed by 3 points ABC.
- */
 bool pointInsideCircle(Point& p, Point& a, Point& b, Point& c)
 {
     // find center and radius of circle defined by 3 points
@@ -59,20 +44,11 @@ bool pointInsideCircle(Point& p, Point& a, Point& b, Point& c)
 
     // return if point is inside circle
     double distance = Point::distance(center, p);
-    return distance > (radius + myEpsilon);
+    return distance < (radius - myEpsilon);
 }
 
 
-bool isConvex(Point& p, Point& a, Point& b)
-{
-    return orientation(p, a, b) > myEpsilon;
-
-    // this is not ideal, but was needed for the star triangulation
-    // to be correct
-    // return orientation(p, a, b) > 200;
-}
-
-void buildWrappingTriangle(vector<Point>& points, TriangleAdjacencyTable& adj)
+vector<Point> buildWrappingTriangle(vector<Point>& points, TriangleAdjacencyTable& adj)
 {
     // get min x, max x
     // get min y, max y
@@ -100,81 +76,113 @@ void buildWrappingTriangle(vector<Point>& points, TriangleAdjacencyTable& adj)
 
     adj.table.push_back(
         {
-            Point({-3*m, -3*m}) + center,
-            Point({3*m, 0}) + center,
-            Point({0, 3*m}) + center,
+            Point({-30*m, -30*m}) + center,
+            Point({30*m, 0}) + center,
+            Point({0, 30*m}) + center,
         });
+
+    return {
+            Point({-30*m, -30*m}) + center,
+            Point({30*m, 0}) + center,
+            Point({0, 30*m}) + center,
+        };
 }
 
-int getContainingTriangle(Point& p, TriangleAdjacencyTable& adj)
+inline int getNextIdx(int i)
 {
-    // TODO: implement this as a topological walk
-    // TODO: consider case where point is at a triangle edge
-    for(int i=0; i<adj.table.size(); ++i)
-        if (pointInsideTriangle(p, adj.table[i].p1,adj.table[i].p2, adj.table[i].p3))
-            return i;
-    return -1;
+    return (i+1)%3;
 }
 
-int* getTriangleRefFromAdjTriang(int v, int t, TriangleAdjacencyTable& adj)
+inline int getPrevIdx(int i)
 {
-    if (t == -1) return nullptr;
-
-    AdjacencyElement& triangle = adj.table[t];
-    if(triangle.t1 == v) return &triangle.t1;
-    else if(triangle.t2 == v) return &triangle.t2;
-    else if(triangle.t3 == v) return &triangle.t3;
-    return nullptr;
+    return (i-1+3)%3;
 }
 
-Point* getOppositePoint(Point* p, int t, TriangleAdjacencyTable& adj)
+/**
+ * A function that verifies is edge in triangle t
+ * opposed to vertex p is a legal edge.
+ * If its not, a flip operation is executed.
+ */
+bool checkAndFlip(int t, int pIdx, TriangleAdjacencyTable& adj)
 {
-    auto& triangle = adj.table[t];
-    AdjacencyElement* oppositeTriang;
-    if(p == &triangle.p1) oppositeTriang = triangle.t1 >= 0 ? &adj.table[triangle.t1] : nullptr;
-    else if(p == &triangle.p2) oppositeTriang = triangle.t1 >= 0 ? &adj.table[triangle.t2] : nullptr;
-    else if(p == &triangle.p3) oppositeTriang =  triangle.t3 >= 0 ? &adj.table[triangle.t3] : nullptr;
-    else return nullptr;
-    if(!oppositeTriang) return nullptr;
+    AdjacencyElement triangle = adj.table[t];
+    int oppositeTriangleIdx = triangle.t[pIdx];
+    if(oppositeTriangleIdx < 0)
+        return false;
 
-    if(oppositeTriang->t3 == t) return &oppositeTriang->p3;
-    if(oppositeTriang->t2 == t) return &oppositeTriang->p2;
-    if(oppositeTriang->t1 == t) return &oppositeTriang->p1;
-    return nullptr;
-}
-
-bool checkAndFlip(int t, Point* p, TriangleAdjacencyTable& adj)
-{
-    auto& triangle = adj.table[t];
-    Point* oppositeP = getOppositePoint(p, t, adj);
-    if (!oppositeP)
-    {
-        cout << "Opposite point not found!\n";
-    }
-    else
-    {
-        cout << "Opposite point " << oppositeP->toStr() << " found.\n";
-    }
+    AdjacencyElement oppositeTriangle = adj.table[oppositeTriangleIdx];
+    int oppositePointIdx = oppositeTriangle.getTriangleIdx(t);
+    Point& oppositePoint = oppositeTriangle.p[oppositePointIdx];
 
     // flip not needed
-    if (!pointInsideCircle(*p, triangle.p1, triangle.p2, triangle.p3))
+    if (!pointInsideCircle(oppositePoint, triangle.p[0], triangle.p[1], triangle.p[2]))
         return false;
-    // if (!isConvex())
+    if (!isConvex(triangle.p[pIdx], triangle.p[getNextIdx(pIdx)], oppositePoint))
+        return false;
+    if (!isConvex(oppositePoint, triangle.p[getPrevIdx(pIdx)], triangle.p[pIdx]))
+        return false;
 
     // flip needed
+    // at this point, triangle and opposite triangle are safe copies of the original elements
+    int a1Idx = t;
+    AdjacencyElement& a1 = adj.table[a1Idx];
+    a1 = {triangle.p[pIdx], oppositePoint, triangle.p[getPrevIdx(pIdx)], -1, -1, -1};
+    int a2Idx = oppositeTriangleIdx;
+    AdjacencyElement& a2 = adj.table[a2Idx];
+    a2 = {triangle.p[pIdx], triangle.p[getNextIdx(pIdx)], oppositePoint, -1, -1, -1};
+
+    int t1Idx = triangle.t[getNextIdx(pIdx)];
+    int t2Idx = oppositeTriangle.t[getPrevIdx(oppositePointIdx)];
+    int t3Idx = oppositeTriangle.t[getNextIdx(oppositePointIdx)];
+    int t4Idx = triangle.t[getPrevIdx(pIdx)];
+
+    AdjacencyElement* t1 = t1Idx >= 0 ? &adj.table[t1Idx] : nullptr;
+    AdjacencyElement* t2 = t2Idx >= 0 ? &adj.table[t2Idx] : nullptr;
+    AdjacencyElement* t3 = t3Idx >= 0 ? &adj.table[t3Idx] : nullptr;
+    AdjacencyElement* t4 = t4Idx >= 0 ? &adj.table[t4Idx] : nullptr;
+
+    if (t1)
+    {
+        t1->t[t1->getTriangleIdx(t)] = a1Idx;
+        a1.t[1] = t1Idx;
+    }
+    if (t2)
+    {
+        t2->t[t2->getTriangleIdx(oppositeTriangleIdx)] = a1Idx;
+        a1.t[0] = t2Idx;
+    }
+    if (t3)
+    {
+        t3->t[t3->getTriangleIdx(oppositeTriangleIdx)] = a2Idx;
+        a2.t[0] = t3Idx;
+    }
+    if (t4)
+    {
+        t4->t[t4->getTriangleIdx(t)] = a2Idx;
+        a2.t[2] = t4Idx;
+    }
+
+    a1.t[2] = a2Idx;
+    a2.t[1] = a1Idx;
+    checkAndFlip(a1Idx, 0, adj);
+    checkAndFlip(a1Idx, 1, adj);
+    checkAndFlip(a1Idx, 2, adj);
+    checkAndFlip(a2Idx, 0, adj);
+    checkAndFlip(a2Idx, 1, adj);
+    checkAndFlip(a2Idx, 2, adj);
 
     return true;
 }
 
-void divideTriangle(Point& p, int t, TriangleAdjacencyTable& adj)
+void divideTriangle(int t, Point& p, TriangleAdjacencyTable& adj)
 {
     AdjacencyElement triangle = adj.table[t];
 
     // triangle will be substituted by a1
-    adj.table[t] = {p, triangle.p2, triangle.p3};
+    adj.table[t] = {p, triangle.p[1], triangle.p[2]};
     // a2 and a3 will be will elements in the list
-    adj.table.push_back({p, triangle.p3, triangle.p1});
-    adj.table.push_back({p, triangle.p1, triangle.p2});
+    adj.table.push_back({p, triangle.p[2], triangle.p[0]});
+    adj.table.push_back({p, triangle.p[0], triangle.p[1]});
 
     int idxA1 = t;
     int idxA2 = adj.table.size()-2;
@@ -185,51 +193,72 @@ void divideTriangle(Point& p, int t, TriangleAdjacencyTable& adj)
     auto& a3 = adj.table[idxA3];
 
     // setting adjacents for a1, a2, a3
-    a1.t1 = triangle.t1;
-    a1.t2 = idxA2;
-    a1.t3 = idxA3;
+    a1.t[0] = triangle.t[0];
+    a1.t[1] = idxA2;
+    a1.t[2] = idxA3;
 
-    a2.t1 = triangle.t2;
-    a2.t2 = idxA3;
-    a2.t3 = idxA1;
+    a2.t[0] = triangle.t[1];
+    a2.t[1] = idxA3;
+    a2.t[2] = idxA1;
 
-    a3.t1 = triangle.t3;
-    a3.t2 = idxA1;
-    a3.t3 = idxA2;
+    a3.t[0] = triangle.t[2];
+    a3.t[1] = idxA1;
+    a3.t[2] = idxA2;
 
     // fixing adjacent triangles
-    int* ref1 = getTriangleRefFromAdjTriang(t, triangle.t1, adj);
-    int* ref2 = getTriangleRefFromAdjTriang(t, triangle.t2, adj);
-    int* ref3 = getTriangleRefFromAdjTriang(t, triangle.t3, adj);
+    if (triangle.t[0] >= 0)
+    {
+        int ref1 = adj.table[triangle.t[0]].getTriangleIdx(t);
+        adj.table[triangle.t[0]].t[ref1] = idxA1;
+    }
+    if (triangle.t[1] >= 0)
+    {
+        int ref2 = adj.table[triangle.t[1]].getTriangleIdx(t);
+        adj.table[triangle.t[1]].t[ref2] = idxA2;
+    }
+    if (triangle.t[2] >= 0)
+    {
+        int ref3 = adj.table[triangle.t[2]].getTriangleIdx(t);
+        adj.table[triangle.t[2]].t[ref3] = idxA3;
+    }
 
-    if (ref1) *ref1 = idxA1;
-    if (ref2) *ref2 = idxA2;
-    if (ref3) *ref3 = idxA3;
+    bool flipped = checkAndFlip(idxA1, 0, adj);
+    flipped = checkAndFlip(idxA2, 0, adj);
+    flipped = checkAndFlip(idxA3, 0, adj);
+}
 
-    bool flipped = checkAndFlip(idxA1, &a1.p1, adj);
-    flipped ? (cout << "true\n") : (cout << "false\n");
-    flipped = checkAndFlip(idxA2, &a2.p1, adj);
-    flipped ? (cout << "true\n") : (cout << "false\n");
-    flipped = checkAndFlip(idxA3, &a3.p1, adj);
-    flipped ? (cout << "true\n") : (cout << "false\n");
+void removeVirtualPoints(vector<Point> virtualPoints, TriangleAdjacencyTable& adj)
+{
+    for(auto it = adj.table.begin(); it != adj.table.end();)
+    {
+        bool shouldRemove = false;
+        for(auto& p : it->p)
+            for(auto& vp : virtualPoints)
+                if (p == vp)
+                {
+                    shouldRemove = true;
+                    break;
+                }
+        if (shouldRemove)
+            it = adj.table.erase(it);
+        else it++;
+    }
 }
 
 void delunayTriangulate(vector<Point>& points, TriangleAdjacencyTable& adj)
 {
-    buildWrappingTriangle(points, adj);
-    vector<Point> slicedPoints = {points.begin(), points.begin()+2};
+    vector<Point> virtualPoints = buildWrappingTriangle(points, adj);
+    vector<Point> slicedPoints = {points.begin(), points.end()};
     // insert one point at a time
     for(auto& p : slicedPoints)
     {
-        int t = getContainingTriangle(p, adj);
+        int t = adj.findContainingTriangle(p);
         if (t < 0)
         {
             cout << "!! Error !! Could not find triangle containing point " << p.toStr() << "\n";
             exit(1);
         }
-        divideTriangle(p, t, adj);
-
-
+        divideTriangle(t, p, adj);
     }
-
+    removeVirtualPoints(virtualPoints, adj);
 }
