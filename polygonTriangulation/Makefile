@@ -64,12 +64,12 @@ LIBS = \
 		-lglib-2.0
 
 
-all: minCircle
+all: triangulation
 
-$(TARGETDIR)/convexHull:
-	$(CCC)  $(CCFLAGS) -o $(TARGETDIR)/minCircle.out $(TARGETDIR)/*.cpp $(LIBS)
+$(TARGETDIR)/triangulation:
+	$(CCC)  $(CCFLAGS) -o $(TARGETDIR)/triangulation.out $(TARGETDIR)/*.cpp $(LIBS)
 
 clean:
 	 $(RM) \
-     $(TARGETDIR)/minCircle.out
+     $(TARGETDIR)/triangulation.out \
 
