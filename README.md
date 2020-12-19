@@ -4,7 +4,7 @@ This repository contains algorithms developed during the Computation Geometry cl
 
 <br>
 
-## Implemented Algorithms:
+## Solved Problems:
 
 * [ConvexHull Generation in 2D](convexHull2D)
 * [Minimal Circle Generation](minimalCircle)
